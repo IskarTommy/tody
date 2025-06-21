@@ -11,7 +11,8 @@ class Task(models.Model):
 
     title = models.CharField(max_length=200)
     description = models.TextField(max_length=500, blank=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tasks')
+    user = models.ForeignKey('accounts.UserProfile', on_delete=models.CASCADE,)
+    project = models.ForeignKey('projects.Project', on_delete=models.CASCADE, null=True, blank=True)
     completed = models.BooleanField(default=False)
     priority = models.CharField(max_length=10, choices=PROIRITY_CHIOCES, default='low')
     due_date = models.DateField(blank=True, null=True)
