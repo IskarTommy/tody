@@ -7,7 +7,6 @@ class UserProfile(models.Model):
     THEME_CHOICES = [
         ('light', 'Light'),
         ('dark', 'Dark')
-
     ]
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
