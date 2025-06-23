@@ -19,7 +19,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
-from accounts.views import test_page_view
+from accounts.views import home_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,8 +27,7 @@ urlpatterns = [
     # path('tasks/', include('tasks.urls')),
     # path('projects/', include('projects.urls')),
     # path('dashboard/', include('dashboard.urls')),
-    # path('', include('dashboard.urls')),
-    #  path('test-page/', test_page_view, name='test-page'),
+    path('', home_view, name='home'),  # Temporary home page until dashboard is ready
 ]
 
 if settings.DEBUG:

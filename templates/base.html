@@ -1,56 +1,75 @@
-{% extends 'base.html' %}
+{% load static tailwind_tags %}
 
-{% block title %}Create a New Account{% endblock title %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Tody App{% endblock title %}</title>
 
-{% block content %}
-<div class="flex items-center justify-center mt-12">
-    <div class="w-full max-w-md p-8 space-y-4 bg-white rounded-xl shadow-lg dark:bg-slate-800">
-        <h2 class="text-2xl font-bold text-center text-slate-900 dark:text-white">
-            Create your Account
-        </h2>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-        <form method="post" class="space-y-4">
-            {% csrf_token %}
+    {% tailwind_css %}
+</head>
+<body class="bg-gray-50 font-[Inter] antialiased">
 
-            <div>
-                <label for="id_username" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Username</label>
-                <input type="text" name="username" id="id_username" class="mt-1 w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white" value="{{ form_data.username|default:'' }}" required>
-            </div>
-            <div>
-                <label for="id_email" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Email Address</label>
-                <input type="email" name="email" id="id_email" class="mt-1 w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white" value="{{ form_data.email|default:'' }}" required>
-            </div>
-            <div>
-                <label for="id_first_name" class="block text-sm font-medium text-slate-700 dark:text-slate-300">First Name (Optional)</label>
-                <input type="text" name="first_name" id="id_first_name" class="mt-1 w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white" value="{{ form_data.first_name|default:'' }}">
-            </div>
-            <div>
-                <label for="id_last_name" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Last Name (Optional)</label>
-                <input type="text" name="last_name" id="id_last_name" class="mt-1 w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white" value="{{ form_data.last_name|default:'' }}">
-            </div>
-            <div>
-                <label for="id_password" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Password</label>
-                <input type="password" name="password" id="id_password" class="mt-1 w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white" required>
-            </div>
-            <div>
-                <label for="id_password2" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Confirm Password</label>
-                <input type="password" name="password2" id="id_password2" class="mt-1 w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white" required>
+    <div class="flex h-screen bg-gray-50">
+        <!-- Sidebar -->
+        <aside class="w-64 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col">
+            <!-- App Logo/Title -->
+            <div class="h-16 flex-shrink-0 px-6 flex items-center">
+                <h2 class="text-xl font-bold text-gray-800">Todo App</h2>
             </div>
 
-            <div>
-                <button type="submit"
-                        class="w-full py-2 px-4 mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
-                    Create Account
-                </button>
-            </div>
-        </form>
+            <!-- Navigation Links -->
+            <nav class="flex-1 px-4 py-4 space-y-2">
+                <a href="#" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                    <!-- Dashboard Icon -->
+                    <svg class="h-6 w-6 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" /></svg>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">
+                    <!-- Todos Icon -->
+                    <svg class="h-6 w-6 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z" /></svg>
+                    <span>Todos</span>
+                </a>
+                <a href="{% url 'accounts:profile' %}" class="flex items-center px-4 py-2 rounded-lg {% if active_page == 'profile' %} bg-gray-200 font-semibold text-gray-900 {% else %} text-gray-700 hover:bg-gray-100 {% endif %}">
+                    <!-- Profile Icon -->
+                    <svg class="h-6 w-6 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+                    <span>Profile</span>
+                </a>
+            </nav>
 
-        <p class="text-sm text-center text-slate-600 dark:text-slate-400">
-            Already have an account?
-            <a href="{% url 'accounts:login' %}" class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
-                Login here
-            </a>
-        </p>
+            <!-- User profile section at bottom -->
+            <div class="mt-auto p-4 border-t border-gray-200">
+                <a href="{% url 'accounts:profile' %}" class="flex items-center group">
+                    <img class="h-10 w-10 rounded-full object-cover" src="{% if user.userprofile.profile_picture %}{{ user.userprofile.profile_picture.url }}{% else %}{% static 'accounts/img/default_avatar.svg' %}{% endif %}" alt="User avatar">
+                    <div class="ml-3">
+                        <p class="text-sm font-semibold text-gray-800 group-hover:text-blue-600">{{ user.first_name|default:user.username }}</p>
+                        <p class="text-xs text-gray-500">{{ user.email }}</p>
+                    </div>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main content -->
+        <main class="flex-1 p-6 sm:p-10 overflow-y-auto">
+            {% if messages %}
+                <div class="mb-6 space-y-2">
+                {% for message in messages %}
+                    <div class="p-4 rounded-md text-sm font-medium {% if message.tags == 'success' %} bg-green-100 text-green-800 {% else %} bg-red-100 text-red-800 {% endif %}" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+                </div>
+            {% endif %}
+
+            {% block content %}
+                <!-- Child template content will be injected here -->
+            {% endblock content %}
+        </main>
     </div>
-</div>
-{% endblock content %}
+</body>
+</html>

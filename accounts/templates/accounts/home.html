@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome to Todo App{% endblock title %}
+
+{% block content %}
+<div class="text-center">
+    <h1 class="text-4xl font-bold text-slate-900 dark:text-white mb-6">
+        Welcome to Todo App
+    </h1>
+    
+    {% if user.is_authenticated %}
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8 max-w-md mx-auto">
+            <h2 class="text-2xl font-semibold text-slate-900 dark:text-white mb-4">
+                Hello, {{ user.first_name|default:user.username }}!
+            </h2>
+            <p class="text-slate-600 dark:text-slate-400 mb-6">
+                You are successfully logged in.
+            </p>
+            <div class="space-y-3">
+                <a href="{% url 'accounts:profile' %}" 
+                   class="block w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-200">
+                    View Profile
+                </a>
+                <a href="{% url 'accounts:logout' %}" 
+                   class="block w-full bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md transition duration-200">
+                    Logout
+                </a>
+            </div>
+        </div>
+    {% else %}
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-lg p-8 max-w-md mx-auto">
+            <h2 class="text-2xl font-semibold text-slate-900 dark:text-white mb-4">
+                Get Started
+            </h2>
+            <p class="text-slate-600 dark:text-slate-400 mb-6">
+                Please log in or create an account to continue.
+            </p>
+            <div class="space-y-3">
+                <a href="{% url 'accounts:login' %}" 
+                   class="block w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-200">
+                    Login
+                </a>
+                <a href="{% url 'accounts:signup' %}" 
+                   class="block w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition duration-200">
+                    Sign Up
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock content %}

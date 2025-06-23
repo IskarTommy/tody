@@ -4,7 +4,8 @@ from . import views
 app_name = 'accounts'
 
 urlpatterns = [
-    path('test/', views.test_page_view, name='login'),
+    path('', views.home_view, name='home'),  # Temporary home page
+    path('search/', views.search_view, name='search'),  # Search functionality
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('signup/', views.signup_view, name='signup'),

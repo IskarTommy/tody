@@ -5,19 +5,81 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from .models import UserProfile
+from .forms import SearchForm, LoginForm
+from django.db.models import Q
+
+
+def home_view(request):
+    """Temporary home page until dashboard is built"""
+    return render(request, 'accounts/home.html')
+
+
+def search_view(request):
+    """
+    Handle search functionality across the application
+    This is server-side logic that processes search queries
+    """
+    # Initialize variables
+    query = None
+    results = []
+    form = SearchForm()
+
+    # Check if this is a search request (GET or POST)
+    if request.method == 'GET' and 'query' in request.GET:
+        # Create form with the search data
+        form = SearchForm(request.GET)
+
+        # Validate the form
+        if form.is_valid():
+            # Get the cleaned search query
+            query = form.cleaned_data['query']
+
+            # Search logic - for now we'll search users since you don't have tasks/projects yet
+            # Later you can add: Task.objects.filter(...), Project.objects.filter(...)
+
+            # Search in User model (first_name, last_name, username, email)
+            user_results = User.objects.filter(
+                Q(first_name__icontains=query) |
+                Q(last_name__icontains=query) |
+                Q(username__icontains=query) |
+                Q(email__icontains=query)
+            ).exclude(id=request.user.id if request.user.is_authenticated else None)
+
+            # Search in UserProfile model (bio, location)
+            profile_results = UserProfile.objects.filter(
+                Q(bio__icontains=query) |
+                Q(location__icontains=query)
+            )
+
+            # Combine results (you can organize this better later)
+            results = {
+                'users': user_results[:5],  # Limit to 5 results
+                'profiles': profile_results[:5],
+                'total_count': user_results.count() + profile_results.count()
+            }
+
+    # Render the search results page
+    context = {
+        'form': form,
+        'query': query,
+        'results': results,
+        'active_page': 'search'
+    }
+
+    return render(request, 'accounts/search_results.html', context)
 
 
 
-def test_page_view(request):
-    return HttpResponse("<h1>Accounts URL is working!</h1>")
+
 
 def login_view(request):
-    # Redirect if already logged in
-    if request.user.is_authenticated:
-        return redirect('accounts:profile')
+    # Redirect if already logged in (TEMPORARILY DISABLED FOR TESTING)
+    # if request.user.is_authenticated:
+    #     # For now redirect to profile, later change to 'dashboard:home'
+    #     return redirect('accounts:profile')
     
     context = {}
     if request.method == 'POST':
@@ -65,9 +127,10 @@ def logout_view(request):
     return redirect('accounts:login')
 
 def signup_view(request):
-    # Redirect if already logged in
-    if request.user.is_authenticated:
-        return redirect('accounts:profile')
+    # Redirect if already logged in (TEMPORARILY DISABLED FOR TESTING)
+    # if request.user.is_authenticated:
+    #     # For now redirect to profile, later change to 'dashboard:home'
+    #     return redirect('accounts:profile')
     
     context = {}
     if request.method == 'POST':
@@ -138,33 +201,34 @@ def profile_view(request):
     except UserProfile.DoesNotExist:
         # Create profile if it doesn't exist
         profile = UserProfile.objects.create(user=request.user)
-    
-    # --- CHANGE 7: Pass back POST data on form submission for re-population ---
-    context = {'profile': profile}
-    if request.method == 'POST':
-        context['form_data'] = request.POST
 
+    if request.method == 'POST':
         # Update user info
         request.user.first_name = request.POST.get('first_name', '').strip()
-        request.user.last_name = request.POST.get('last_name', '').strip()
         request.user.email = request.POST.get('email', '').strip()
         request.user.save()
-        
+
         # Update profile info
         profile.bio = request.POST.get('bio', '').strip()
         profile.phone = request.POST.get('phone', '').strip()
         profile.location = request.POST.get('location', '').strip()
         profile.theme_preference = request.POST.get('theme_preference', 'light')
         profile.email_notifications = request.POST.get('email_notifications') == 'on'
-        
+
         # Handle profile picture upload
         if 'profile_picture' in request.FILES:
             profile.profile_picture = request.FILES['profile_picture']
-        
+
         profile.save()
         messages.success(request, 'Profile updated successfully!')
         return redirect('accounts:profile')
-    
+
+    # Add this context dictionary
+    context = {
+        'profile': profile,
+        'active_page': 'profile'  # This tells the base template which link to highlight
+    }
+
     return render(request, 'accounts/profile.html', context)
 
 @login_required
