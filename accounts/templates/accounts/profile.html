@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Profile{% endblock title %}
+
+{% block content %}
+<div class="space-y-8">
+    <h1 class="text-3xl font-bold text-slate-800 dark:text-slate-100">Account Settings</h1>
+
+    <!-- Main Grid Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Left Column: Profile Card -->
+        <div class="lg:col-span-1">
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg h-full">
+                <div class="flex flex-col items-center text-center">
+                    <div class="relative">
+                        <img class="w-24 h-24 mb-3 rounded-full shadow-lg object-cover" 
+                             src="{% if profile.profile_picture %}{{ profile.profile_picture.url }}{% else %}{% static 'accounts/img/default_avatar.svg' %}{% endif %}" 
+                             alt="{{ user.username }}'s profile picture">
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">{{ user.first_name }} {{ user.last_name }}</h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">@{{ user.username }}</p>
+                    <p class="mt-4 text-sm text-slate-600 dark:text-slate-300">
+                        {{ profile.bio|default:"No bio yet." }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Forms -->
+        <div class="lg:col-span-2 space-y-8">
+            
+            <!-- Form 1: Update Profile Details -->
+            <form method="post" action="{% url 'accounts:profile' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg">
+                    <h3 class="text-xl font-semibold mb-4 text-slate-800 dark:text-slate-100">Profile Information</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- First Name -->
+                        <div>
+                            <label for="first_name" class="block text-sm font-medium text-slate-700 dark:text-slate-300">First Name</label>
+                            <input type="text" name="first_name" id="first_name" class="mt-1 w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:border-slate-600" value="{{ user.first_name }}">
+                        </div>
+                        <!-- Last Name -->
+                        <div>
+                            <label for="last_name" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Last Name</label>
+                            <input type="text" name="last_name" id="last_name" class="mt-1 w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:border-slate-600" value="{{ user.last_name }}">
+                        </div>
+                        <!-- Email -->
+                        <div class="md:col-span-2">
+                            <label for="email" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Email Address</label>
+                            <input type="email" name="email" id="email" class="mt-1 w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:border-slate-600" value="{{ user.email }}">
+                        </div>
+                        <!-- Bio -->
+                        <div class="md:col-span-2">
+                            <label for="bio" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Bio</label>
+                            <textarea name="bio" id="bio" rows="3" class="mt-1 w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:border-slate-600">{{ profile.bio }}</textarea>
+                        </div>
+                         <!-- Profile Picture -->
+                        <div class="md:col-span-2">
+                            <label for="profile_picture" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Profile Picture</label>
+                            <input type="file" name="profile_picture" id="profile_picture" class="mt-1 block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-slate-700 dark:file:text-slate-300 dark:hover:file:bg-slate-600">
+                        </div>
+                    </div>
+                    <div class="pt-6 text-right">
+                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md">
+                            Save Changes
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Form 2: Change Password -->
+            <form method="post" action="{% url 'accounts:change_password' %}">
+                {% csrf_token %}
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg">
+                    <h3 class="text-xl font-semibold mb-4 text-slate-800 dark:text-slate-100">Change Password</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="current_password" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Current Password</label>
+                            <input type="password" name="current_password" id="current_password" class="mt-1 w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:border-slate-600" required>
+                        </div>
+                        <div>
+                            <label for="new_password1" class="block text-sm font-medium text-slate-700 dark:text-slate-300">New Password</label>
+                            <input type="password" name="new_password1" id="new_password1" class="mt-1 w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:border-slate-600" required>
+                        </div>
+                        <div>
+                            <label for="new_password2" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Confirm New Password</label>
+                            <input type="password" name="new_password2" id="new_password2" class="mt-1 w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-700 dark:border-slate-600" required>
+                        </div>
+                    </div>
+                    <div class="pt-6 text-right">
+                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md">
+                            Change Password
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+{% endblock content %}

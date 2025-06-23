@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Create a New Account{% endblock title %}
+
+{% block content %}
+<div class="flex items-center justify-center mt-12">
+    <div class="w-full max-w-md p-8 space-y-4 bg-white rounded-xl shadow-lg dark:bg-slate-800">
+        <h2 class="text-2xl font-bold text-center text-slate-900 dark:text-white">
+            Create your Account
+        </h2>
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+
+            <div>
+                <label for="id_username" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Username</label>
+                <input type="text" name="username" id="id_username" class="mt-1 w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white" value="{{ form_data.username|default:'' }}" required>
+            </div>
+            <div>
+                <label for="id_email" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Email Address</label>
+                <input type="email" name="email" id="id_email" class="mt-1 w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white" value="{{ form_data.email|default:'' }}" required>
+            </div>
+            <div>
+                <label for="id_first_name" class="block text-sm font-medium text-slate-700 dark:text-slate-300">First Name (Optional)</label>
+                <input type="text" name="first_name" id="id_first_name" class="mt-1 w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white" value="{{ form_data.first_name|default:'' }}">
+            </div>
+            <div>
+                <label for="id_last_name" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Last Name (Optional)</label>
+                <input type="text" name="last_name" id="id_last_name" class="mt-1 w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white" value="{{ form_data.last_name|default:'' }}">
+            </div>
+            <div>
+                <label for="id_password" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Password</label>
+                <input type="password" name="password" id="id_password" class="mt-1 w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white" required>
+            </div>
+            <div>
+                <label for="id_password2" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Confirm Password</label>
+                <input type="password" name="password2" id="id_password2" class="mt-1 w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white" required>
+            </div>
+
+            <div>
+                <button type="submit"
+                        class="w-full py-2 px-4 mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                    Create Account
+                </button>
+            </div>
+        </form>
+
+        <p class="text-sm text-center text-slate-600 dark:text-slate-400">
+            Already have an account?
+            <a href="{% url 'accounts:login' %}" class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
+                Login here
+            </a>
+        </p>
+    </div>
+</div>
+{% endblock content %}

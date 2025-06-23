@@ -40,11 +40,22 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    #My apps
     'accounts',
     'tasks',
     'projects',
     'dashboard',
+
+    #Third Party apps
+    'tailwind',
+    'theme',
 ]
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -120,12 +131,25 @@ USE_I18N = True
 USE_TZ = True
 
 
+# This is for user-uploaded files, like profile pictures.
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/' # For development, serve static files from this URL
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
 
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+TAILWIND_APP_NAME = 'theme'
+NPM_BIN_PATH = "C:/Program Files/nodejs/npm.cmd"
+

@@ -1,0 +1,8 @@
+{
+    "python.defaultInterpreterPath": "C:\\Users\\Iskanda\\.virtualenvs\\tody-tqwCXKyT\\Scripts\\python.exe",
+    "python.terminal.activateEnvironment": true,
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.extraPaths": [
+        "C:\\Users\\Iskanda\\.virtualenvs\\tody-tqwCXKyT\\Lib\\site-packages"
+    ]
+}
