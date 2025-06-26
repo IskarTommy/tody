@@ -24,7 +24,7 @@ from accounts.views import home_view
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
-    # path('tasks/', include('tasks.urls')),
+    path('tasks/', include('tasks.urls')),
     # path('projects/', include('projects.urls')),
     # path('dashboard/', include('dashboard.urls')),
     path('', home_view, name='home'),  # Temporary home page until dashboard is ready

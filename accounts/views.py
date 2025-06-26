@@ -22,7 +22,7 @@ def search_view(request):
     Handle search functionality across the application
     This is server-side logic that processes search queries
     """
-    # Initialize variables
+    # Initialize variables``
     query = None
     results = []
     form = SearchForm()

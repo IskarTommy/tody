@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ task.title }} - TaskFlow{% endblock title %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-8">
+    {% csrf_token %}
+    
+    <!-- Header with Actions -->
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+        <div>
+            <div class="flex items-center space-x-3 mb-2">
+                <!-- Completion Toggle -->
+                <button data-task-id="{{ task.id }}" class="toggle-task w-8 h-8 rounded-full border-2 {% if task.completed %}bg-green-500 border-green-500{% else %}border-gray-300 hover:border-green-400{% endif %} flex items-center justify-center transition-all duration-200">
+                    {% if task.completed %}
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    {% endif %}
+                </button>
+                
+                <h1 class="text-4xl font-bold text-gray-900 {% if task.completed %}line-through text-gray-500{% endif %}">
+                    {{ task.title }}
+                </h1>
+                
+                <!-- Priority Badge -->
+                <span class="px-3 py-1 text-sm font-semibold rounded-full
+                    {% if task.priority == 'high' %}bg-red-100 text-red-800
+                    {% elif task.priority == 'medium' %}bg-yellow-100 text-yellow-800
+                    {% else %}bg-green-100 text-green-800{% endif %}">
+                    {{ task.get_priority_display }}
+                </span>
+            </div>
+            
+            <div class="flex items-center space-x-6 text-gray-600">
+                {% if task.project %}
+                    <div class="flex items-center space-x-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                        </svg>
+                        <span>{{ task.project.title }}</span>
+                    </div>
+                {% endif %}
+                
+                {% if task.due_date %}
+                    <div class="flex items-center space-x-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>Due {{ task.due_date|date:"M d, Y" }}</span>
+                    </div>
+                {% endif %}
+                
+                <div class="flex items-center space-x-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span>Created {{ task.created_at|timesince }} ago</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="flex items-center space-x-3">
+            <a href="{% url 'tasks:task_edit' task.id %}" 
+               class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center space-x-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+                <span>Edit</span>
+            </a>
+            
+            <a href="{% url 'tasks:task_delete' task.id %}" 
+               class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center space-x-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+                <span>Delete</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Task Details Card -->
+    <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8">
+        
+        <!-- Description -->
+        {% if task.description %}
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">Description</h3>
+                <div class="prose prose-gray max-w-none">
+                    <p class="text-gray-700 leading-relaxed {% if task.completed %}line-through{% endif %}">
+                        {{ task.description|linebreaks }}
+                    </p>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Task Properties -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Status -->
+            <div class="bg-gray-50 rounded-xl p-4">
+                <h4 class="text-sm font-semibold text-gray-600 mb-2">Status</h4>
+                <div class="flex items-center space-x-2">
+                    {% if task.completed %}
+                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                        <span class="text-green-700 font-medium">Completed</span>
+                    {% else %}
+                        <div class="w-3 h-3 bg-orange-500 rounded-full"></div>
+                        <span class="text-orange-700 font-medium">Pending</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Priority -->
+            <div class="bg-gray-50 rounded-xl p-4">
+                <h4 class="text-sm font-semibold text-gray-600 mb-2">Priority</h4>
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 rounded-full
+                        {% if task.priority == 'high' %}bg-red-500
+                        {% elif task.priority == 'medium' %}bg-yellow-500
+                        {% else %}bg-green-500{% endif %}"></div>
+                    <span class="font-medium
+                        {% if task.priority == 'high' %}text-red-700
+                        {% elif task.priority == 'medium' %}text-yellow-700
+                        {% else %}text-green-700{% endif %}">
+                        {{ task.get_priority_display }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Project -->
+            <div class="bg-gray-50 rounded-xl p-4">
+                <h4 class="text-sm font-semibold text-gray-600 mb-2">Project</h4>
+                {% if task.project %}
+                    <span class="text-gray-900 font-medium">{{ task.project.title }}</span>
+                {% else %}
+                    <span class="text-gray-500">No project assigned</span>
+                {% endif %}
+            </div>
+
+            <!-- Due Date -->
+            <div class="bg-gray-50 rounded-xl p-4">
+                <h4 class="text-sm font-semibold text-gray-600 mb-2">Due Date</h4>
+                {% if task.due_date %}
+                    <span class="text-gray-900 font-medium">{{ task.due_date|date:"M d, Y" }}</span>
+                {% else %}
+                    <span class="text-gray-500">No due date</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="flex justify-between items-center">
+        <a href="{% url 'tasks:task_list' %}" 
+           class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            <span>Back to Tasks</span>
+        </a>
+        
+        <div class="text-sm text-gray-500">
+            Last updated {{ task.updated_at|timesince }} ago
+        </div>
+    </div>
+
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Task toggle functionality
+    const toggleButton = document.querySelector('.toggle-task');
+    if (toggleButton) {
+        toggleButton.addEventListener('click', function() {
+            const taskId = this.getAttribute('data-task-id');
+            toggleTask(taskId, this);
+        });
+    }
+});
+
+function toggleTask(taskId, buttonElement) {
+    // Add loading state
+    buttonElement.disabled = true;
+    buttonElement.classList.add('opacity-50');
+    
+    // Get CSRF token
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    fetch(`/tasks/${taskId}/toggle/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken,
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Reload page to update all elements
+            location.reload();
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Something went wrong!');
+    })
+    .finally(() => {
+        buttonElement.disabled = false;
+        buttonElement.classList.remove('opacity-50');
+    });
+}
+</script>
+{% endblock extra_js %}
+{% endblock content %}
