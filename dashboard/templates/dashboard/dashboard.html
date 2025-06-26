@@ -1,0 +1,661 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - TaskFlow{% endblock title %}
+
+{% block content %}
+<!-- Dashboard Overview -->
+<div class="space-y-8">
+    
+    <!-- Welcome Header -->
+    <div class="text-center animate-fade-in">
+        <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl mb-6 shadow-lg float-animation">
+            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+        </div>
+        <h1 class="text-5xl font-bold text-gray-900 mb-3">
+            Welcome back, {{ user.first_name|default:user.username }}! 👋
+        </h1>
+        <p class="text-xl text-gray-600">Here's your productivity overview for today</p>
+    </div>
+
+    <!-- Quick Stats Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Total Tasks -->
+        <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-3xl p-6 shadow-xl transform hover:-translate-y-1 transition-all duration-300 animate-slide-up">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-blue-100 text-sm font-medium">Total Tasks</p>
+                    <p class="text-3xl font-bold">{{ total_tasks }}</p>
+                </div>
+                <div class="bg-white/20 rounded-2xl p-3">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completed Today -->
+        <div class="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-3xl p-6 shadow-xl transform hover:-translate-y-1 transition-all duration-300 animate-slide-up">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-green-100 text-sm font-medium">Completed Today</p>
+                    <p class="text-3xl font-bold">{{ completed_today }}</p>
+                </div>
+                <div class="bg-white/20 rounded-2xl p-3">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Due Today -->
+        <div class="bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-3xl p-6 shadow-xl transform hover:-translate-y-1 transition-all duration-300 animate-slide-up">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-orange-100 text-sm font-medium">Due Today</p>
+                    <p class="text-3xl font-bold">{{ due_today }}</p>
+                </div>
+                <div class="bg-white/20 rounded-2xl p-3">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completion Rate -->
+        <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-3xl p-6 shadow-xl transform hover:-translate-y-1 transition-all duration-300 animate-slide-up">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-purple-100 text-sm font-medium">Completion Rate</p>
+                    <p class="text-3xl font-bold">{{ completion_rate }}%</p>
+                </div>
+                <div class="bg-white/20 rounded-2xl p-3">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Analytics Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+
+        <!-- Productivity Heatmap -->
+        <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <svg class="w-6 h-6 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+                Productivity Heatmap
+            </h3>
+            <div class="relative h-48">
+                <canvas id="productivityHeatmap"></canvas>
+            </div>
+            <div class="mt-3 text-center">
+                <span class="text-sm text-gray-600">Last 30 days activity</span>
+            </div>
+        </div>
+
+        <!-- Task Velocity Gauge -->
+        <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <svg class="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                </svg>
+                Task Velocity
+            </h3>
+            <div class="relative h-48">
+                <canvas id="velocityGauge"></canvas>
+            </div>
+            <div class="mt-3 text-center">
+                <span class="text-2xl font-bold text-gray-900" id="velocityScore">{{ completion_rate }}</span>
+                <p class="text-sm text-gray-600">Productivity Score</p>
+            </div>
+        </div>
+
+        <!-- Priority Distribution Radar -->
+        <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <svg class="w-6 h-6 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                </svg>
+                Task Balance
+            </h3>
+            <div class="relative h-48">
+                <canvas id="balanceRadar"></canvas>
+            </div>
+            <div class="mt-3 text-center">
+                <span class="text-sm text-gray-600">Work-life balance score</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Recent Tasks -->
+        <div class="lg:col-span-2">
+            <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900 flex items-center">
+                        <svg class="w-6 h-6 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Recent Tasks
+                    </h2>
+                    <a href="{% url 'tasks:task_list' %}" class="text-indigo-600 hover:text-indigo-700 font-medium text-sm flex items-center">
+                        View All
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </a>
+                </div>
+
+                {% if recent_tasks %}
+                    <div class="space-y-4">
+                        {% for task in recent_tasks %}
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200">
+                            <div class="flex items-center space-x-4">
+                                <!-- Task Toggle -->
+                                <button data-task-id="{{ task.id }}" class="toggle-task w-6 h-6 rounded-full border-2 {% if task.completed %}bg-green-500 border-green-500{% else %}border-gray-300 hover:border-green-400{% endif %} flex items-center justify-center transition-all duration-200">
+                                    {% if task.completed %}
+                                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    {% endif %}
+                                </button>
+                                
+                                <div>
+                                    <h3 class="font-semibold text-gray-900 {% if task.completed %}line-through text-gray-500{% endif %}">
+                                        {{ task.title }}
+                                    </h3>
+                                    <div class="flex items-center space-x-3 text-sm text-gray-600">
+                                        <!-- Priority -->
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full
+                                            {% if task.priority == 'high' %}bg-red-100 text-red-800
+                                            {% elif task.priority == 'medium' %}bg-yellow-100 text-yellow-800
+                                            {% else %}bg-green-100 text-green-800{% endif %}">
+                                            {{ task.get_priority_display }}
+                                        </span>
+                                        
+                                        {% if task.due_date %}
+                                            <span class="flex items-center">
+                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                </svg>
+                                                {{ task.due_date|date:"M d" }}
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <a href="{% url 'tasks:task_detail' task.id %}" class="text-gray-400 hover:text-indigo-600 transition-colors duration-200">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-12">
+                        <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">No tasks yet</h3>
+                        <p class="text-gray-600 mb-4">Create your first task to get started!</p>
+                        <a href="{% url 'tasks:task_create' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors duration-200">
+                            Create Task
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Productivity Insights -->
+        <div class="space-y-6">
+            <!-- Today's Focus -->
+            <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6">
+                <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    Today's Focus
+                </h3>
+                
+                {% if high_priority_tasks %}
+                    <div class="space-y-3">
+                        {% for task in high_priority_tasks %}
+                        <div class="flex items-center space-x-3 p-3 bg-red-50 rounded-xl">
+                            <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                            <div class="flex-1">
+                                <p class="font-medium text-gray-900">{{ task.title }}</p>
+                                {% if task.due_date %}
+                                    <p class="text-sm text-gray-600">Due {{ task.due_date|date:"M d" }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-gray-600">No high priority tasks for today! 🎉</p>
+                {% endif %}
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6">
+                <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Quick Actions
+                </h3>
+                
+                <div class="space-y-3">
+                    <a href="{% url 'tasks:task_create' %}" class="flex items-center space-x-3 p-3 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-colors duration-200">
+                        <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                        </div>
+                        <span class="font-medium text-gray-900">Create New Task</span>
+                    </a>
+                    
+                    <a href="{% url 'tasks:task_list' %}" class="flex items-center space-x-3 p-3 bg-green-50 hover:bg-green-100 rounded-xl transition-colors duration-200">
+                        <div class="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                            </svg>
+                        </div>
+                        <span class="font-medium text-gray-900">View All Tasks</span>
+                    </a>
+
+                    <a href="{% url 'dashboard:analytics' %}" class="flex items-center space-x-3 p-3 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors duration-200">
+                        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </div>
+                        <span class="font-medium text-gray-900">Detailed Analytics</span>
+                    </a>
+
+                    <a href="{% url 'dashboard:reports' %}" class="flex items-center space-x-3 p-3 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors duration-200">
+                        <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                        </div>
+                        <span class="font-medium text-gray-900">Generate Reports</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Productivity Tip -->
+            <div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-3xl p-6 border border-indigo-100">
+                <h3 class="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                    💡 Productivity Tip
+                </h3>
+                <p class="text-gray-700 text-sm leading-relaxed">
+                    Start your day by completing 2-3 small tasks. This creates momentum and builds confidence for tackling bigger challenges!
+                </p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% csrf_token %}
+
+<!-- Hidden data for advanced charts -->
+<div id="advancedChartData" style="display: none;">
+    <span id="heatmapData">{{ heatmap_json|safe }}</span>
+    <span id="maxDailyTasks">{{ max_daily_tasks }}</span>
+    <span id="priorityData">{{ priority_stats.high }},{{ priority_stats.medium }},{{ priority_stats.low }}</span>
+    <span id="velocityData">{{ velocity_data|join:"," }}</span>
+    <span id="avgVelocity">{{ avg_velocity }}</span>
+</div>
+
+{% block extra_js %}
+<script src="{% static 'js/tasks.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('TaskFlow Dashboard JS loaded');
+
+    // Initialize dashboard features
+    initializeDashboardAnimations();
+    initializeTaskToggle();
+    initializeAdvancedCharts();
+});
+
+function initializeDashboardAnimations() {
+    // Staggered animation for stats cards
+    const statsCards = document.querySelectorAll('.animate-slide-up');
+    statsCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'all 0.6s ease-out';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 150);
+    });
+}
+
+function initializeTaskToggle() {
+    // Task toggle functionality for dashboard
+    const toggleButtons = document.querySelectorAll('.toggle-task');
+    toggleButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const taskId = this.getAttribute('data-task-id');
+            toggleTaskDashboard(taskId, this);
+        });
+    });
+}
+
+function toggleTaskDashboard(taskId, buttonElement) {
+    // Add loading state
+    buttonElement.disabled = true;
+    buttonElement.classList.add('opacity-50');
+    
+    // Get CSRF token
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    fetch(`/tasks/${taskId}/toggle/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken,
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Reload page to update all dashboard stats
+            location.reload();
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Something went wrong!');
+    })
+    .finally(() => {
+        buttonElement.disabled = false;
+        buttonElement.classList.remove('opacity-50');
+    });
+}
+
+function initializeAdvancedCharts() {
+    console.log('Initializing advanced charts...');
+
+    // Create all advanced charts
+    createProductivityHeatmap();
+    createVelocityGauge();
+    createBalanceRadar();
+}
+
+/**
+ * Create productivity heatmap chart
+ */
+function createProductivityHeatmap() {
+    const ctx = document.getElementById('productivityHeatmap');
+    if (!ctx) return;
+
+    // Get heatmap data
+    const heatmapElement = document.getElementById('heatmapData');
+    const maxTasksElement = document.getElementById('maxDailyTasks');
+
+    if (!heatmapElement) return;
+
+    try {
+        const heatmapData = JSON.parse(heatmapElement.textContent);
+        const maxTasks = parseInt(maxTasksElement?.textContent || '5');
+
+        console.log('Heatmap data:', heatmapData);
+        console.log('Max daily tasks:', maxTasks);
+
+        // Create a grid-like visualization
+        const labels = heatmapData.map(item => {
+            const date = new Date(item.date);
+            return date.getDate(); // Day of month
+        });
+
+        const values = heatmapData.map(item => item.value);
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Tasks Completed',
+                    data: values,
+                    backgroundColor: function(context) {
+                        const value = context.parsed.y;
+                        if (value === 0) return 'rgba(229, 231, 235, 0.5)'; // Light gray for no activity
+
+                        // Green intensity based on activity
+                        const intensity = Math.min(value / Math.max(maxTasks, 3), 1);
+                        if (intensity <= 0.25) return 'rgba(34, 197, 94, 0.3)';
+                        if (intensity <= 0.5) return 'rgba(34, 197, 94, 0.5)';
+                        if (intensity <= 0.75) return 'rgba(34, 197, 94, 0.7)';
+                        return 'rgba(34, 197, 94, 1)';
+                    },
+                    borderColor: 'rgba(34, 197, 94, 0.8)',
+                    borderWidth: 1,
+                    borderRadius: 4,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            title: function(context) {
+                                const index = context[0].dataIndex;
+                                const date = new Date(heatmapData[index].date);
+                                return date.toLocaleDateString('en-US', {
+                                    weekday: 'short',
+                                    month: 'short',
+                                    day: 'numeric'
+                                });
+                            },
+                            label: function(context) {
+                                const value = context.parsed.y;
+                                return `${value} task${value !== 1 ? 's' : ''} completed`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            font: { size: 10 },
+                            maxTicksLimit: 10
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1,
+                            font: { size: 10 }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        }
+                    }
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutQuart'
+                }
+            }
+        });
+    } catch (e) {
+        console.error('Error creating heatmap:', e);
+        console.log('Raw heatmap data:', heatmapElement.textContent);
+    }
+}
+
+/**
+ * Create velocity gauge chart
+ */
+function createVelocityGauge() {
+    const ctx = document.getElementById('velocityGauge');
+    if (!ctx) return;
+
+    const avgVelocity = parseFloat(document.getElementById('avgVelocity')?.textContent || '0');
+    const maxVelocity = 20; // Adjust based on your needs
+    const percentage = Math.min((avgVelocity / maxVelocity) * 100, 100);
+
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [percentage, 100 - percentage],
+                backgroundColor: [
+                    'rgba(59, 130, 246, 0.8)',
+                    'rgba(229, 231, 235, 0.3)'
+                ],
+                borderWidth: 0,
+                cutout: '75%'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { enabled: false }
+            },
+            animation: {
+                animateRotate: true,
+                duration: 2000
+            }
+        },
+        plugins: [{
+            beforeDraw: function(chart) {
+                const ctx = chart.ctx;
+                const centerX = chart.chartArea.left + (chart.chartArea.right - chart.chartArea.left) / 2;
+                const centerY = chart.chartArea.top + (chart.chartArea.bottom - chart.chartArea.top) / 2;
+
+                ctx.save();
+                ctx.font = 'bold 24px Inter';
+                ctx.fillStyle = '#1f2937';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(avgVelocity.toFixed(1), centerX, centerY - 5);
+
+                ctx.font = '12px Inter';
+                ctx.fillStyle = '#6b7280';
+                ctx.fillText('tasks/week', centerX, centerY + 15);
+                ctx.restore();
+            }
+        }]
+    });
+}
+
+/**
+ * Create balance radar chart
+ */
+function createBalanceRadar() {
+    const ctx = document.getElementById('balanceRadar');
+    if (!ctx) return;
+
+    const priorityElement = document.getElementById('priorityData');
+    if (!priorityElement) return;
+
+    const priorityData = priorityElement.textContent.split(',').map(num => parseInt(num.trim()));
+
+    new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['High Priority', 'Medium Priority', 'Low Priority'],
+            datasets: [{
+                label: 'Task Distribution',
+                data: priorityData,
+                backgroundColor: 'rgba(147, 51, 234, 0.2)',
+                borderColor: 'rgba(147, 51, 234, 1)',
+                borderWidth: 2,
+                pointBackgroundColor: 'rgba(147, 51, 234, 1)',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        font: { size: 10 }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    },
+                    angleLines: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                }
+            },
+            animation: {
+                duration: 1500,
+                easing: 'easeOutQuart'
+            }
+        }
+    });
+}
+</script>
+
+<style>
+@keyframes fade-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-up {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fade-in 0.8s ease-out;
+}
+
+.animate-slide-up {
+    animation: slide-up 0.6s ease-out;
+}
+
+.float-animation {
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+</style>
+{% endblock extra_js %}
+{% endblock content %}

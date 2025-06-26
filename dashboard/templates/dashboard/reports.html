@@ -1,0 +1,274 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Reports - TaskFlow{% endblock title %}
+
+{% block content %}
+<div class="space-y-8">
+    
+    <!-- Header -->
+    <div class="text-center animate-fade-in">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl mb-4 shadow-lg">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+        </div>
+        <h1 class="text-4xl font-bold text-gray-900 mb-2">Productivity Reports</h1>
+        <p class="text-gray-600 text-lg">Generate and download detailed productivity reports</p>
+    </div>
+
+    <!-- Report Generation -->
+    <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8">
+        <h2 class="text-2xl font-semibold text-gray-900 mb-6">Generate Custom Report</h2>
+        
+        <form class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Date Range -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-900 mb-2">Date Range</label>
+                    <select class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        <option>Last 7 days</option>
+                        <option>Last 30 days</option>
+                        <option>Last 90 days</option>
+                        <option>This year</option>
+                        <option>Custom range</option>
+                    </select>
+                </div>
+
+                <!-- Report Type -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-900 mb-2">Report Type</label>
+                    <select class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        <option>Productivity Summary</option>
+                        <option>Task Completion Analysis</option>
+                        <option>Time Tracking Report</option>
+                        <option>Priority Distribution</option>
+                        <option>Project Progress</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Format Options -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-900 mb-3">Export Format</label>
+                <div class="flex space-x-4">
+                    <label class="flex items-center">
+                        <input type="radio" name="format" value="pdf" checked class="w-4 h-4 text-emerald-600">
+                        <span class="ml-2 text-gray-700">PDF</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="radio" name="format" value="excel" class="w-4 h-4 text-emerald-600">
+                        <span class="ml-2 text-gray-700">Excel</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="radio" name="format" value="csv" class="w-4 h-4 text-emerald-600">
+                        <span class="ml-2 text-gray-700">CSV</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Generate Button -->
+            <button type="submit" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white py-3 px-8 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center space-x-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <span>Generate Report</span>
+            </button>
+        </form>
+    </div>
+
+    <!-- Quick Reports -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- Weekly Summary -->
+        <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Ready</span>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Weekly Summary</h3>
+            <p class="text-gray-600 text-sm mb-4">Your productivity overview for this week</p>
+            <div class="flex items-center justify-between">
+                <span class="text-2xl font-bold text-gray-900">{{ completed_this_week }}</span>
+                <button class="text-blue-600 hover:text-blue-700 font-medium text-sm">Download</button>
+            </div>
+        </div>
+
+        <!-- Monthly Report -->
+        <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+                <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Ready</span>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Monthly Report</h3>
+            <p class="text-gray-600 text-sm mb-4">Comprehensive monthly productivity analysis</p>
+            <div class="flex items-center justify-between">
+                <span class="text-2xl font-bold text-gray-900">{{ completion_rate }}%</span>
+                <button class="text-green-600 hover:text-green-700 font-medium text-sm">Download</button>
+            </div>
+        </div>
+
+        <!-- Priority Analysis -->
+        <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6 hover:shadow-2xl transition-all duration-300">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                </div>
+                <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full">Ready</span>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Priority Analysis</h3>
+            <p class="text-gray-600 text-sm mb-4">How you handle different priority levels</p>
+            <div class="flex items-center justify-between">
+                <span class="text-2xl font-bold text-gray-900">{{ high_priority_tasks.count }}</span>
+                <button class="text-purple-600 hover:text-purple-700 font-medium text-sm">Download</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Reports -->
+    <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8">
+        <h2 class="text-2xl font-semibold text-gray-900 mb-6">Recent Reports</h2>
+        
+        <div class="space-y-4">
+            <!-- Report Item -->
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200">
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-900">Weekly Productivity Report</h3>
+                        <p class="text-sm text-gray-600">Generated on {{ today|date:"M d, Y" }} • PDF • 2.3 MB</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button class="text-gray-400 hover:text-indigo-600 transition-colors duration-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </button>
+                    <button class="text-gray-400 hover:text-red-600 transition-colors duration-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- More report items would go here -->
+            <div class="text-center py-8">
+                <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No more reports</h3>
+                <p class="text-gray-600">Generate your first custom report above!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="flex justify-between items-center">
+        <a href="{% url 'dashboard:analytics' %}" 
+           class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            <span>Back to Analytics</span>
+        </a>
+        
+        <a href="{% url 'dashboard:dashboard' %}" 
+           class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center space-x-2">
+            <span>Back to Dashboard</span>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+            </svg>
+        </a>
+    </div>
+
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Reports page loaded');
+    
+    // Handle report generation form
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Show loading state
+        const button = this.querySelector('button[type="submit"]');
+        const originalText = button.innerHTML;
+        
+        button.disabled = true;
+        button.innerHTML = `
+            <svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            <span>Generating...</span>
+        `;
+        
+        // Simulate report generation
+        setTimeout(() => {
+            button.disabled = false;
+            button.innerHTML = originalText;
+            
+            // Show success message
+            showToast('Report generated successfully!', 'success');
+        }, 2000);
+    });
+});
+
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-xl shadow-lg transform translate-x-full transition-transform duration-300 ${
+        type === 'success' 
+            ? 'bg-green-500 text-white' 
+            : 'bg-red-500 text-white'
+    }`;
+    toast.textContent = message;
+    
+    document.body.appendChild(toast);
+    
+    // Slide in
+    setTimeout(() => {
+        toast.classList.remove('translate-x-full');
+    }, 100);
+    
+    // Slide out and remove
+    setTimeout(() => {
+        toast.classList.add('translate-x-full');
+        setTimeout(() => {
+            if (document.body.contains(toast)) {
+                document.body.removeChild(toast);
+            }
+        }, 300);
+    }, 3000);
+}
+</script>
+
+<style>
+@keyframes fade-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fade-in 0.8s ease-out;
+}
+</style>
+{% endblock extra_js %}
+{% endblock content %}

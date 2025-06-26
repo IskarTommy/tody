@@ -165,9 +165,24 @@
         </header>
         {% endif %}
 
-    <!-- Sidebar Navigation -->
+    <!-- Mobile menu button -->
     {% if user.is_authenticated %}
-    <aside class="w-64 fixed top-0 left-0 z-50 h-screen bg-white border-r border-gray-200 flex flex-col">
+    <div class="lg:hidden fixed top-4 left-4 z-50">
+        <button id="mobileMenuBtn" class="bg-white/90 backdrop-blur-xl p-2 rounded-xl shadow-lg border border-gray-200/50 text-gray-700 hover:text-indigo-600 transition-colors duration-200">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="w-64 fixed top-0 left-0 z-40 h-screen bg-white border-r border-gray-200 flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
+        <!-- Sidebar toggle button (desktop) -->
+        <button id="sidebarToggle" class="hidden lg:block absolute -right-3 top-6 bg-white border border-gray-200 rounded-full p-1 shadow-md hover:shadow-lg transition-all duration-200 z-10">
+            <svg id="toggleIcon" class="w-4 h-4 text-gray-600 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+        </button>
         <!-- Sidebar Header -->
         <div class="p-6 border-b border-gray-200/50">
             <div class="flex items-center space-x-4">
@@ -194,7 +209,7 @@
         <!-- Navigation Links -->
         <nav class="p-4 space-y-2">
             <!-- Dashboard -->
-            <a href="/" class="{% if active_page == 'dashboard' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-600 border-r-2 border-indigo-600{% else %}text-gray-700 hover:bg-gray-50 hover:text-indigo-600{% endif %} flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 group">
+            <a href="{% url 'dashboard:dashboard' %}" class="{% if active_page == 'dashboard' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-600 border-r-2 border-indigo-600{% else %}text-gray-700 hover:bg-gray-50 hover:text-indigo-600{% endif %} flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 group">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v6H8V5z"></path>
@@ -227,7 +242,7 @@
             </a>
 
             <!-- Analytics -->
-            <a href="#" class="text-gray-700 hover:bg-gray-50 hover:text-indigo-600 flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 group">
+            <a href="{% url 'dashboard:analytics' %}" class="{% if active_page == 'analytics' %}bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-600 border-r-2 border-indigo-600{% else %}text-gray-700 hover:bg-gray-50 hover:text-indigo-600{% endif %} flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 group">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                 </svg>
@@ -237,12 +252,12 @@
 
             <!-- Quick Actions -->
             <div class="p-4 border-t border-gray-200/50 mt-auto">
-                <button class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
+                <a href="{% url 'tasks:task_create' %}" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                     </svg>
                     <span>New Task</span>
-                </button>
+                </a>
             </div>
 
             <!-- User Profile -->
@@ -306,8 +321,13 @@
 
 
 
+    <!-- Sidebar overlay for mobile -->
+    {% if user.is_authenticated %}
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden opacity-0 invisible transition-all duration-300"></div>
+    {% endif %}
+
     <!-- Main Content -->
-    <main class="{% if user.is_authenticated %}md:ml-64{% endif %} bg-gray-50 min-h-screen">
+    <main id="mainContent" class="{% if user.is_authenticated %}lg:ml-64{% endif %} bg-gray-50 min-h-screen transition-all duration-300 ease-in-out">
         <div class="max-w-7xl mx-auto p-6 md:p-10">
             {% block content %}
             {% endblock content %}
@@ -500,6 +520,76 @@
                     fab.style.transform = 'scale(1)';
                 }, 200);
             }, 8000);
+        }
+
+        // Initialize sidebar functionality
+        initializeSidebar();
+
+        /**
+         * Initialize collapsible sidebar functionality
+         */
+        function initializeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const toggleIcon = document.getElementById('toggleIcon');
+
+            let sidebarCollapsed = false;
+
+            // Desktop sidebar toggle
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebarCollapsed = !sidebarCollapsed;
+
+                    if (sidebarCollapsed) {
+                        // Collapse sidebar
+                        sidebar.style.transform = 'translateX(-100%)';
+                        mainContent.style.marginLeft = '0';
+                        toggleIcon.style.transform = 'rotate(180deg)';
+                    } else {
+                        // Expand sidebar
+                        sidebar.style.transform = 'translateX(0)';
+                        mainContent.style.marginLeft = '16rem'; // w-64 = 16rem
+                        toggleIcon.style.transform = 'rotate(0deg)';
+                    }
+                });
+            }
+
+            // Mobile menu toggle
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    sidebar.style.transform = 'translateX(0)';
+                    sidebarOverlay.style.opacity = '1';
+                    sidebarOverlay.style.visibility = 'visible';
+                });
+            }
+
+            // Close mobile menu when clicking overlay
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', function() {
+                    sidebar.style.transform = 'translateX(-100%)';
+                    sidebarOverlay.style.opacity = '0';
+                    sidebarOverlay.style.visibility = 'hidden';
+                });
+            }
+
+            // Close mobile menu on window resize to desktop
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 1024) { // lg breakpoint
+                    sidebarOverlay.style.opacity = '0';
+                    sidebarOverlay.style.visibility = 'hidden';
+                    if (!sidebarCollapsed) {
+                        sidebar.style.transform = 'translateX(0)';
+                    }
+                } else {
+                    sidebar.style.transform = 'translateX(-100%)';
+                    mainContent.style.marginLeft = '0';
+                }
+            });
+
+            console.log('Sidebar functionality initialized');
         }
     </script>
 </body>
