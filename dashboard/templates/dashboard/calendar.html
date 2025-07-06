@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load calendar_extras %}
+
+{% block title %}Calendar - TaskFlow{% endblock title %}
+
+{% block content %}
+<!-- Modern Calendar Interface -->
+<div class="space-y-8">
+    {% csrf_token %}
+    
+    <!-- Header Section -->
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+        <div>
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">Calendar</h1>
+            <p class="text-gray-600 text-lg">View your tasks in calendar format</p>
+        </div>
+        <div class="flex items-center space-x-4">
+            <a href="{% url 'tasks:task_create' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition-colors duration-200 flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                New Task
+            </a>
+        </div>
+    </div>
+
+    <!-- Calendar Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Total Tasks This Month -->
+        <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6 animate-slide-up">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Tasks This Month</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ total_tasks_month }}</p>
+                </div>
+                <div class="bg-blue-100 p-3 rounded-2xl">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completed This Month -->
+        <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6 animate-slide-up">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Completed</p>
+                    <p class="text-3xl font-bold text-green-600">{{ completed_tasks_month }}</p>
+                </div>
+                <div class="bg-green-100 p-3 rounded-2xl">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Overdue Tasks -->
+        <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6 animate-slide-up">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Overdue</p>
+                    <p class="text-3xl font-bold text-red-600">{{ overdue_tasks }}</p>
+                </div>
+                <div class="bg-red-100 p-3 rounded-2xl">
+                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Widget -->
+    <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 overflow-hidden">
+        <!-- Calendar Header -->
+        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 p-6">
+            <div class="flex items-center justify-between">
+                <a href="?month={{ prev_month }}&year={{ prev_year }}" class="text-white hover:text-indigo-200 transition-colors duration-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                </a>
+                
+                <h2 class="text-2xl font-bold text-white">{{ month_name }} {{ year }}</h2>
+                
+                <a href="?month={{ next_month }}&year={{ next_year }}" class="text-white hover:text-indigo-200 transition-colors duration-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
+        </div>
+
+        <!-- Calendar Grid -->
+        <div class="p-6">
+            <!-- Day Headers (Sunday First - US Style) -->
+            <div class="grid grid-cols-7 gap-1 mb-4">
+                <div class="text-center text-sm font-semibold text-gray-600 py-2">Sun</div>
+                <div class="text-center text-sm font-semibold text-gray-600 py-2">Mon</div>
+                <div class="text-center text-sm font-semibold text-gray-600 py-2">Tue</div>
+                <div class="text-center text-sm font-semibold text-gray-600 py-2">Wed</div>
+                <div class="text-center text-sm font-semibold text-gray-600 py-2">Thu</div>
+                <div class="text-center text-sm font-semibold text-gray-600 py-2">Fri</div>
+                <div class="text-center text-sm font-semibold text-gray-600 py-2">Sat</div>
+            </div>
+
+            <!-- Calendar Days -->
+            <div class="grid grid-cols-7 gap-1">
+                {% for week in calendar_weeks %}
+                    {% for day in week %}
+                        <div class="min-h-[120px] border border-gray-100 rounded-lg p-2 hover:bg-gray-50 transition-colors duration-200 {% if day == today.day and month == today.month and year == today.year %}bg-indigo-50 border-indigo-200{% endif %}">
+                            {% if day != 0 %}
+                                <!-- Day Number -->
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-medium text-gray-900 {% if day == today.day and month == today.month and year == today.year %}text-indigo-600{% endif %}">
+                                        {{ day }}
+                                    </span>
+                                    {% if day in tasks_by_date %}
+                                        <span class="bg-indigo-100 text-indigo-600 text-xs px-2 py-1 rounded-full font-medium">
+                                            {{ tasks_by_date|lookup:day|length }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Tasks for this day -->
+                                {% if day in tasks_by_date %}
+                                    <div class="space-y-1">
+                                        {% for task in tasks_by_date|lookup:day %}
+                                            {% if forloop.counter <= 3 %}
+                                                <div class="text-xs p-1 rounded {% if task.completed %}bg-green-100 text-green-700{% elif task.priority == 'high' %}bg-red-100 text-red-700{% elif task.priority == 'medium' %}bg-yellow-100 text-yellow-700{% else %}bg-blue-100 text-blue-700{% endif %} truncate">
+                                                    {{ task.title }}
+                                                </div>
+                                            {% elif forloop.counter == 4 %}
+                                                <div class="text-xs text-gray-500 font-medium">
+                                                    +{{ tasks_by_date|lookup:day|length|add:"-3" }} more
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Today's Tasks -->
+    {% if today.month == month and today.year == year and today.day in tasks_by_date %}
+        <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6">
+            <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                Today's Tasks
+            </h3>
+            <div class="space-y-3">
+                {% for task in tasks_by_date|lookup:today.day %}
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-3 h-3 rounded-full {% if task.priority == 'high' %}bg-red-500{% elif task.priority == 'medium' %}bg-yellow-500{% else %}bg-blue-500{% endif %}"></div>
+                            <div>
+                                <h4 class="font-medium text-gray-900 {% if task.completed %}line-through text-gray-500{% endif %}">{{ task.title }}</h4>
+                                {% if task.description %}
+                                    <p class="text-sm text-gray-600">{{ task.description|truncatewords:10 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs px-2 py-1 rounded-full {% if task.priority == 'high' %}bg-red-100 text-red-700{% elif task.priority == 'medium' %}bg-yellow-100 text-yellow-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+                                {{ task.get_priority_display }}
+                            </span>
+                            <a href="{% url 'tasks:task_detail' task.id %}" class="text-indigo-600 hover:text-indigo-800 font-medium text-sm">
+                                View
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock content %}
+
+{% block extra_js %}
+<script src="{% static 'js/calendar.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Calendar page loaded');
+    
+    // Initialize calendar animations
+    initializeCalendarAnimations();
+});
+
+function initializeCalendarAnimations() {
+    // Staggered animation for stats cards
+    const statsCards = document.querySelectorAll('.animate-slide-up');
+    statsCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'all 0.6s ease-out';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 150);
+    });
+}
+</script>
+{% endblock extra_js %}

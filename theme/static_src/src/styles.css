@@ -8,3 +8,101 @@
   * the scope of this path.
   */
 @source "../../../**/*.{html,py,js}";
+
+/* Custom Focus Styles - Remove Ugly Box Highlighting */
+@layer utilities {
+  /* Remove default focus outlines and ugly browser highlights */
+  *:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Beautiful focus styles for inputs */
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: none !important;
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+    transform: translateY(-1px);
+    transition: all 0.2s ease-out;
+  }
+
+  /* Elegant focus for buttons */
+  button:focus {
+    outline: none !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3) !important;
+    transition: all 0.2s ease-out;
+  }
+
+  /* Beautiful focus for radio buttons and checkboxes */
+  input[type="radio"]:focus,
+  input[type="checkbox"]:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
+  }
+
+  /* Smooth hover effects */
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    transition: all 0.2s ease-out;
+  }
+
+  /* Glassmorphism focus enhancement */
+  .glass-focus:focus {
+    backdrop-filter: blur(20px) !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-color: #6366f1 !important;
+    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.15) !important;
+  }
+}
+
+/* Remove ALL Blue Browser Outlines Completely */
+@layer base {
+  /* Remove ALL focus outlines and blue boxes */
+  *,
+  *:focus,
+  *:focus-visible,
+  *:active {
+    outline: none !important;
+    outline-width: 0 !important;
+    outline-style: none !important;
+    outline-color: transparent !important;
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-focus-ring-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  /* Specifically target form elements */
+  input,
+  textarea,
+  select,
+  button,
+  label {
+    outline: none !important;
+    -webkit-appearance: none !important;
+  }
+
+  /* Remove blue highlights on mobile */
+  * {
+    -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+}
+
+@layer utilities {
+  /* Smooth hover effects */
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    transition: all 0.2s ease-out;
+  }
+
+  /* Glassmorphism focus enhancement */
+  .glass-focus:focus {
+    backdrop-filter: blur(20px) !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-color: #6366f1 !important;
+    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.15) !important;
+  }
+}

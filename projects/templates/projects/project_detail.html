@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ project.title }} - TaskFlow{% endblock title %}
+
+{% block content %}
+<div class="space-y-8">
+    {% csrf_token %}
+    
+    <!-- Back Button and Project Header -->
+    <div class="flex flex-col space-y-4">
+        <a href="{% url 'projects:project_list' %}" class="inline-flex items-center text-indigo-600 hover:text-indigo-800 font-medium">
+            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Projects
+        </a>
+        
+        <!-- Project Header -->
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+            <div>
+                <div class="flex items-center space-x-3">
+                    <h1 class="text-4xl font-bold text-gray-900">{{ project.title }}</h1>
+                    <span id="project-status-{{ project.id }}" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium {% if project.completed %}bg-green-100 text-green-800{% else %}bg-blue-100 text-blue-800{% endif %}">
+                        {% if project.completed %}Completed{% else %}Active{% endif %}
+                    </span>
+                </div>
+                <p class="text-gray-600 mt-2">{{ project.description|default:"No description provided." }}</p>
+            </div>
+            
+            <!-- Project Actions -->
+            <div class="flex space-x-3 mt-4 lg:mt-0">
+                {% if is_owner %}
+                <a href="{% url 'projects:project_members' project.id %}" class="bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-xl font-medium border border-gray-300 transition-colors duration-200 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    Manage Members
+                </a>
+                <a href="{% url 'projects:project_edit' project.id %}" class="bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-xl font-medium border border-gray-300 transition-colors duration-200 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
+                    Edit Project
+                </a>
+                <a href="{% url 'projects:project_delete' project.id %}" class="bg-white hover:bg-gray-50 text-red-600 px-4 py-2 rounded-xl font-medium border border-gray-300 transition-colors duration-200 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                    Delete
+                </a>
+                {% endif %}
+                
+                <!-- Toggle Status Button -->
+                <button data-project-id="{{ project.id }}" class="toggle-project-status bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl font-medium transition-colors duration-200">
+                    {% if project.completed %}Mark as Active{% else %}Mark as Completed{% endif %}
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Project Members -->
+    <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">Project Members</h2>
+        
+        <div class="flex flex-wrap gap-2">
+            <!-- Project Owner -->
+            <div class="flex items-center bg-indigo-50 text-indigo-700 px-3 py-2 rounded-xl">
+                <span class="font-medium">{{ project.user.user.username }}</span>
+                <span class="ml-2 text-xs bg-indigo-200 text-indigo-800 px-2 py-0.5 rounded-full">Owner</span>
+            </div>
+            
+            <!-- Project Members -->
+            {% for member in members %}
+                <div class="flex items-center bg-gray-50 text-gray-700 px-3 py-2 rounded-xl">
+                    <span class="font-medium">{{ member.user.username }}</span>
+                </div>
+            {% endfor %}
+            
+            {% if is_owner %}
+                <a href="{% url 'projects:project_members' project.id %}" class="flex items-center bg-gray-50 hover:bg-gray-100 text-gray-700 px-3 py-2 rounded-xl transition-colors duration-200">
+                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    <span class="font-medium">Add Member</span>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Project Tasks -->
+    <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-gray-900">Tasks</h2>
+            
+            <a href="{% url 'tasks:task_create' %}?project={{ project.id }}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl font-medium transition-colors duration-200 flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                Add Task
+            </a>
+        </div>
+        
+        <!-- Task Filters -->
+        <div class="mb-6">
+            <form method="get" class="flex space-x-4">
+                <select name="status" onchange="this.form.submit()" class="rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    <option value="">All Tasks</option>
+                    <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
+                    <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
+                </select>
+            </form>
+        </div>
+        
+        <!-- Tasks List -->
+        {% if tasks %}
+            <div class="space-y-4">
+                {% for task in tasks %}
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200">
+                        <div class="flex items-center space-x-3">
+                            <!-- Task Completion Checkbox -->
+                            <div class="flex-shrink-0">
+                                <input type="checkbox" id="task-{{ task.id }}" data-task-id="{{ task.id }}" class="toggle-task-status h-5 w-5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500" {% if task.completed %}checked{% endif %}>
+                            </div>
+                            
+                            <!-- Task Title and Due Date -->
+                            <div>
+                                <h3 class="text-lg font-medium text-gray-900 {% if task.completed %}line-through text-gray-500{% endif %}">{{ task.title }}</h3>
+                                {% if task.due_date %}
+                                    <p class="text-sm text-gray-500">Due: {{ task.due_date|date:"M d, Y" }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Task Actions -->
+                        <div class="flex space-x-2">
+                            <a href="{% url 'tasks:task_detail' task.id %}" class="text-indigo-600 hover:text-indigo-800">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                            </a>
+                            <a href="{% url 'tasks:task_edit' task.id %}" class="text-gray-600 hover:text-gray-800">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- Empty State for Tasks -->
+            <div class="text-center py-8">
+                <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                </svg>
+                <h3 class="text-xl font-medium text-gray-900 mb-2">No Tasks Yet</h3>
+                <p class="text-gray-600 mb-4">Add tasks to this project to get started.</p>
+                <a href="{% url 'tasks:task_create' %}?project={{ project.id }}" class="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl font-medium transition-colors duration-200">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Add First Task
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+<!-- Project-specific JavaScript -->
+<script src="{% static 'js/projects.js' %}"></script>
+<script src="{% static 'js/tasks.js' %}"></script>
+{% endblock extra_js %}

@@ -2,8 +2,10 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta, date
 from tasks.models import Task
+import json
+import calendar
 
 
 @login_required
@@ -238,3 +240,89 @@ def reports_view(request):
     }
 
     return render(request, 'dashboard/reports.html', context)
+
+
+@login_required
+def calendar_view(request):
+    """
+    Calendar view showing tasks in a monthly calendar format
+    """
+    try:
+        user_profile = request.user.userprofile
+    except:
+        messages.error(request, 'Please complete your profile first.')
+        return redirect('accounts:profile')
+
+    # Get current date or requested month/year
+    today = timezone.now().date()
+    year = int(request.GET.get('year', today.year))
+    month = int(request.GET.get('month', today.month))
+
+    # Create calendar for the month (Sunday first - US style)
+    calendar.setfirstweekday(6)  # 6 = Sunday
+    cal = calendar.monthcalendar(year, month)
+    month_name = calendar.month_name[month]
+
+    # Get all tasks for the user in this month
+    month_start = date(year, month, 1)
+    if month == 12:
+        month_end = date(year + 1, 1, 1) - timedelta(days=1)
+    else:
+        month_end = date(year, month + 1, 1) - timedelta(days=1)
+
+    tasks_in_month = Task.objects.filter(
+        user=user_profile,
+        due_date__range=[month_start, month_end]
+    ).order_by('due_date', 'priority')
+
+    # Group tasks by date
+    tasks_by_date = {}
+    for task in tasks_in_month:
+        if task.due_date:
+            day = task.due_date.day
+            if day not in tasks_by_date:
+                tasks_by_date[day] = []
+            tasks_by_date[day].append(task)
+
+    # Navigation dates
+    if month == 1:
+        prev_month = 12
+        prev_year = year - 1
+    else:
+        prev_month = month - 1
+        prev_year = year
+
+    if month == 12:
+        next_month = 1
+        next_year = year + 1
+    else:
+        next_month = month + 1
+        next_year = year
+
+    # Quick stats for the month
+    total_tasks_month = tasks_in_month.count()
+    completed_tasks_month = tasks_in_month.filter(completed=True).count()
+    overdue_tasks = Task.objects.filter(
+        user=user_profile,
+        due_date__lt=today,
+        completed=False
+    ).count()
+
+    context = {
+        'calendar_weeks': cal,
+        'month': month,
+        'year': year,
+        'month_name': month_name,
+        'today': today,
+        'tasks_by_date': tasks_by_date,
+        'prev_month': prev_month,
+        'prev_year': prev_year,
+        'next_month': next_month,
+        'next_year': next_year,
+        'total_tasks_month': total_tasks_month,
+        'completed_tasks_month': completed_tasks_month,
+        'overdue_tasks': overdue_tasks,
+        'active_page': 'calendar'
+    }
+
+    return render(request, 'dashboard/calendar.html', context)

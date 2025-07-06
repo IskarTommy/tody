@@ -23,7 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('tasks/', include('tasks.urls')),
-    # path('projects/', include('projects.urls')),
+    path('projects/', include('projects.urls')),
     path('dashboard/', include('dashboard.urls')),
     path('', include('dashboard.urls')),  # Dashboard as home page
 ]

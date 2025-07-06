@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Project - TaskFlow{% endblock title %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <!-- Back Button -->
+    <a href="{% url 'projects:project_detail' project.id %}" class="inline-flex items-center text-indigo-600 hover:text-indigo-800 font-medium mb-6">
+        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        Back to Project
+    </a>
+    
+    <!-- Edit Project Form -->
+    <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-6">Edit Project</h1>
+        
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Project Title -->
+            <div>
+                <label for="title" class="block text-sm font-medium text-gray-700 mb-2">Project Title *</label>
+                <input type="text" name="title" id="title" required value="{{ project.title }}" class="w-full rounded-xl border-2 border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:bg-white hover:border-gray-400 transition-all duration-200 shadow-sm" placeholder="Enter project title">
+            </div>
+            
+            <!-- Project Description -->
+            <div>
+                <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <textarea name="description" id="description" rows="4" class="w-full rounded-xl border-2 border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:bg-white hover:border-gray-400 transition-all duration-200 shadow-sm resize-none" placeholder="Describe your project (optional)">{{ project.description }}</textarea>
+            </div>
+            
+            <!-- Project Color -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-3">Project Color</label>
+                <div class="grid grid-cols-5 gap-4">
+                    {% for color_value, color_name in color_choices %}
+                        <div class="relative">
+                            <input type="radio" name="color" value="{{ color_value }}" id="color_{{ color_value }}" class="hidden" {% if project.color == color_value %}checked{% endif %}>
+                            <label for="color_{{ color_value }}" class="block w-12 h-12 rounded-full bg-{{ color_value }}-500 cursor-pointer hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl border-4 border-transparent">
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Project Status -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-3">Project Status</label>
+                <div class="flex items-center space-x-4">
+                    <label class="flex items-center cursor-pointer">
+                        <input type="checkbox" name="completed" class="hidden" {% if project.completed %}checked{% endif %} id="completed">
+                        <div class="w-6 h-6 border-2 border-gray-300 rounded-md mr-3 flex items-center justify-center transition-all duration-200" id="checkbox-display">
+                            <svg class="w-4 h-4 text-white hidden" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <span class="text-gray-700">Mark project as completed</span>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Submit Button -->
+            <div class="pt-4">
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-semibold transition-colors duration-200 flex items-center justify-center" id="submit-btn">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Update Project
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle color selection
+    const colorInputs = document.querySelectorAll('input[name="color"]');
+    const colorLabels = document.querySelectorAll('label[for^="color_"]');
+    
+    // Set initial selected state
+    colorInputs.forEach(input => {
+        if (input.checked) {
+            const label = document.querySelector(`label[for="${input.id}"]`);
+            if (label) {
+                const colorValue = input.value;
+                label.classList.add('ring-4', `ring-${colorValue}-300`, 'ring-offset-2', 'scale-110');
+                label.classList.remove('border-transparent');
+            }
+        }
+    });
+    
+    colorLabels.forEach(label => {
+        label.addEventListener('click', function() {
+            // Remove selected state from all labels
+            colorLabels.forEach(l => {
+                l.classList.remove('ring-4', 'ring-offset-2', 'scale-110');
+                // Remove all possible ring colors
+                ['red', 'blue', 'green', 'yellow', 'purple', 'pink', 'indigo', 'gray'].forEach(color => {
+                    l.classList.remove(`ring-${color}-300`);
+                });
+                l.classList.add('border-transparent');
+            });
+            
+            // Add selected state to clicked label
+            this.classList.add('ring-4', 'ring-offset-2', 'scale-110');
+            this.classList.remove('border-transparent');
+            
+            // Get color from the for attribute
+            const colorValue = this.getAttribute('for').replace('color_', '');
+            this.classList.add(`ring-${colorValue}-300`);
+        });
+    });
+    
+    // Handle completion checkbox
+    const completedCheckbox = document.getElementById('completed');
+    const checkboxDisplay = document.getElementById('checkbox-display');
+    const checkboxIcon = checkboxDisplay.querySelector('svg');
+    
+    function updateCheckboxDisplay() {
+        if (completedCheckbox.checked) {
+            checkboxDisplay.classList.add('bg-green-500', 'border-green-500');
+            checkboxDisplay.classList.remove('border-gray-300');
+            checkboxIcon.classList.remove('hidden');
+        } else {
+            checkboxDisplay.classList.remove('bg-green-500', 'border-green-500');
+            checkboxDisplay.classList.add('border-gray-300');
+            checkboxIcon.classList.add('hidden');
+        }
+    }
+    
+    // Set initial state
+    updateCheckboxDisplay();
+    
+    // Handle checkbox clicks
+    checkboxDisplay.addEventListener('click', function() {
+        completedCheckbox.checked = !completedCheckbox.checked;
+        updateCheckboxDisplay();
+    });
+    
+    // Prevent duplicate submissions
+    const form = document.querySelector('form');
+    const submitBtn = document.getElementById('submit-btn');
+    let isSubmitting = false;
+    
+    form.addEventListener('submit', function(e) {
+        if (isSubmitting) {
+            e.preventDefault();
+            return false;
+        }
+        
+        isSubmitting = true;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<svg class="animate-spin h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Updating...';
+        
+        // Re-enable after 3 seconds as fallback
+        setTimeout(() => {
+            isSubmitting = false;
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Update Project';
+        }, 3000);
+    });
+});
+</script>
+{% endblock content %}
